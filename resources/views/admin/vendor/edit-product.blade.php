@@ -1,0 +1,165 @@
+@extends('admin.master')
+@section('title', 'Edit Product Info')
+@section('body')
+    <!-- PAGE-HEADER -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Product Module</h1>
+        </div>
+        <div class="ms-auto pageheader-btn">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="javascript:void(0);">Product</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Edit Product</li>
+            </ol>
+        </div>
+    </div>
+    <!-- PAGE-HEADER END -->
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12">
+            <div class="card">
+                <div class="card-header border-bottom">
+                    <h3 class="card-title">Edit Product Form</h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-success">{{ session('message') }}</p>
+                    <form class="form-horizontal" method="post" action="{{ route('vendor-product.update', $product->id) }}" enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+                        <div class="row mb-4">
+                            <label class="col-md-3 form-label">Select Category</label>
+                            <div class="col-md-9 form-group">
+                                <select name="category_id" onchange="setSubCategory(this.value)" class="form-control select2-show-search form-select w-100" data-placeholder="Choose any category">
+                                    <option label="Choose one"></option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" @selected($category->id == $product->category_id)>{{$category->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <label class="col-md-3 form-label">Select SubCategory</label>
+                            <div class="col-md-9 form-group">
+                                <select name="sub_category_id" id="subCategoryId" class="form-control select2 form-select w-100" data-placeholder="Choose any subcategory">
+                                    <option label="Choose one"></option>
+                                    @foreach($sub_categories as $subCategory)
+                                        <option value="{{ $subCategory->id }}" @selected($subCategory->id == $product->sub_category_id)>{{$subCategory->name}}</option>
+                                    @endforeach
+                                </select>
+                                <span class="text-white bg-danger">{{ $errors->has('sub_category_id') ? $errors->first('sub_category_id') : ''}}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <label class="col-md-3 form-label">Select Brand</label>
+                            <div class="col-md-9 form-group">
+                                <select name="brand_id" class="form-control select2-show-search form-select w-100" data-placeholder="Choose any brand">
+                                    <option label="Choose one"></option>
+                                    @foreach($brands as $brand)
+                                        <option value="{{ $brand->id }}" @selected($brand->id == $product->brand_id)>{{$brand->name}}</option>
+                                    @endforeach
+                                </select>
+                                <span class="text-white bg-danger">{{ $errors->has('brand_id') ? $errors->first('brand_id') : ''}}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <label class="col-md-3 form-label">Select Unit</label>
+                            <div class="col-md-9 form-group">
+                                <select name="unit_id" class="form-control select2-show-search form-select w-100" data-placeholder="Choose any unit">
+                                    <option label="Choose one"></option>
+                                    @foreach($units as $unit)
+                                        <option value="{{ $unit->id }}" @selected($unit->id == $product->unit_id)>{{$unit->code}}</option>
+                                    @endforeach
+                                </select>
+                                <span class="text-white bg-danger">{{ $errors->has('unit_id') ? $errors->first('unit_id') : ''}}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <label class="col-md-3 form-label">Select Colors</label>
+                            <div class="col-md-9 form-group">
+                                <select multiple class="form-control select2-show-search form-select" name="colors[]" data-placeholder="Choose colors">
+                                    <option label="Choose one"></option>
+                                    @foreach($colors as $color)
+                                        <option value="{{ $color->id }}" @foreach($product->colors as $singleColor) @selected($color->id == $singleColor->color_id) @endforeach>{{$color->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <span class="text-white bg-danger">{{ $errors->has('color_id') ? $errors->first('color_id') : ''}}</span>
+                        </div>
+                        <div class="row mb-4">
+                            <label class="col-md-3 form-label">Select Size</label>
+                            <div class="col-md-9 form-group">
+                                <select multiple class="form-control select2-show-search form-select" name="sizes[]" data-placeholder="Choose sizes">
+                                    <option label="Choose one"></option>
+                                    @foreach($sizes as $size)
+                                        <option value="{{ $size->id }}" @foreach($product->sizes as $singleSize) @selected($size->id == $singleSize->size_id) @endforeach>{{$size->code}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <label for="name" class="col-md-3 form-label">Product Name</label>
+                            <div class="col-md-9">
+                                <input class="form-control" id="name" name="name" value="{{ $product->name }}" placeholder="Enter product Name" type="text">
+                                <span class="text-white bg-danger">{{ $errors->has('name') ? $errors->first('name') : ''}}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <label for="code" class="col-md-3 form-label">Product Code</label>
+                            <div class="col-md-9">
+                                <input class="form-control" id="code" name="code" value="{{ $product->code }}" placeholder="Enter product code" type="text">
+                                <span class="text-white bg-danger">{{ $errors->has('code') ? $errors->first('code') : ''}}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <label for="short_description" class="col-md-3 form-label">Short Description</label>
+                            <div class="col-md-9">
+                                <textarea class="form-control" maxlength="225"  name="short_description" id="short_description" placeholder="Enter product short description" rows="2">{{ $product->short_description }}</textarea>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <label for="long_description" class="col-md-3 form-label">Long Description</label>
+                            <div class="col-md-9">
+                                <div class="card card-body">
+                                    <textarea class="content" name="long_description">{{ $product->long_description }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <label for="image" class="col-md-3 form-label">Image</label>
+                            <div class="col-sm-12 col-md-5 mg-t-10 mg-sm-t-0">
+                                <input type="file" name="image" class="dropify" data-height="200" />
+                                <img src="{{ asset($product->image) }}" alt="" height="120" width="130"/>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <label for="image" class="col-md-3 form-label">Sub Images</label>
+                            <div class="col-sm-12 col-md-5 mg-t-10 mg-sm-t-0">
+                                <input type="file" name="sub_Images[]" class="form-control"  multiple/>
+                                @foreach($product->productSubImages as $productSubImage)
+                                    <img src="{{ asset($productSubImage->image) }}" alt="" height="120" width="130"/>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <label class="col-md-3 form-label">Product Price</label>
+                            <div class="col-sm-12 col-md-9 mg-t-10 mg-sm-t-0">
+                                <div class="input-group">
+                                    <input type="number" class="form-control" value="{{ $product->regular_price }}" name="regular_price" placeholder="Enter regular price"/>
+                                    <input type="number" class="form-control" value="{{ $product->selling_price }}" name="selling_price" placeholder="Enter discounted price"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <label id="stock_amount" class="col-md-3 form-label">Stock Amount</label>
+                            <div class="col-sm-12 col-md-9 mg-t-10 mg-sm-t-0">
+                                <input id="stock_amount" type="number" class="form-control" value="{{ $product->stock_amount }}" name="stock_amount" placeholder="Enter stock amount"/>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary float-end" type="submit">Update Product info</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
